@@ -3,7 +3,7 @@ version:             0.1.0.0
 #synopsis:
 #description:
 homepage:            https://github.com/githubuser/almost-constant-functions#readme
-license:             Hippocratic
+license:             OtherLicense
 author:              Marco Perone
 maintainer:          pasafama@gmail.com
 copyright:           2021 Marco Perone
@@ -23,3 +23,5 @@ ghc-options:
 
 library:
   source-dirs:      src
+  dependencies:
+    - containers
