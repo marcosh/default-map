@@ -1,0 +1,1 @@
+module AlmostConstantFunctions.AlmostConstantFunctions where

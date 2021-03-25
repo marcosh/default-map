@@ -1,0 +1,25 @@
+name:                almost-constant-functions
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/githubuser/almost-constant-functions#readme
+license:             Hippocratic
+author:              Marco Perone
+maintainer:          pasafama@gmail.com
+copyright:           2021 Marco Perone
+category:            Library
+extra-source-files:
+- README.md
+
+dependencies:
+  - base >= 4.7 && < 5
+
+ghc-options:
+  -W
+  -Wall
+  -Werror
+  -fwrite-ide-info
+  -hiedir=.hie
+
+library:
+  source-dirs:      src
