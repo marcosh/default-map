@@ -35,6 +35,7 @@ class KeyValue c k v where
 -- list
 
 newtype KeyValueList k v = KeyValueList [(k, v)]
+  deriving (Eq, Show)
 
 instance Eq k => KeyValue KeyValueList k v where
   empty = KeyValueList []
@@ -43,6 +44,7 @@ instance Eq k => KeyValue KeyValueList k v where
 -- lazy maps
 
 newtype LazyMap k v = LazyMap (M.Map k v)
+  deriving (Eq, Show)
 
 instance Ord k => KeyValue LazyMap k v where
   empty = LazyMap ML.empty
@@ -51,6 +53,7 @@ instance Ord k => KeyValue LazyMap k v where
 -- strict maps
 
 newtype StrictMap k v = StrictMap (M.Map k v)
+  deriving (Eq, Show)
 
 instance Ord k => KeyValue StrictMap k v where
   empty = StrictMap MS.empty
@@ -59,6 +62,7 @@ instance Ord k => KeyValue StrictMap k v where
 -- lazy hashmaps
 
 newtype LazyHash k v = LazyHash (H.HashMap k v)
+  deriving (Eq, Show)
 
 instance (Eq k, Hashable k) => KeyValue LazyHash k v where
   empty = LazyHash HL.empty
@@ -67,6 +71,7 @@ instance (Eq k, Hashable k) => KeyValue LazyHash k v where
 -- strict hashmaps
 
 newtype StrictHash k v = StrictHash (H.HashMap k v)
+  deriving (Eq, Show)
 
 instance (Eq k, Hashable k) => KeyValue StrictHash k v where
   empty = StrictHash HS.empty
