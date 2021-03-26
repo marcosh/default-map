@@ -23,7 +23,7 @@ class KeyValue c k v where
   empty :: c k v
   -- singleton :: k -> v -> c k v
   -- fromList :: [(k, v)] -> c k v
-  -- insert :: k -> v -> c k v -> c k v
+  insert :: k -> v -> c k v -> c k v
   -- delete :: k -> c k v -> c k v
   lookup :: k -> c k v -> Maybe v
   -- union :: c k v -> c k v -> c k v
@@ -37,8 +37,17 @@ class KeyValue c k v where
 newtype KeyValueList k v = KeyValueList [(k, v)]
   deriving (Eq, Show)
 
+-- TODO: find a linear time implementation
+deDuplicateKeys :: (Eq k ) => [(k, v)] -> KeyValueList k v
+deDuplicateKeys pairs = KeyValueList $ foldr (\(k, v) xs -> (k, v) : removeKey k xs) [] pairs
+  where
+    removeKey _ []                       = []
+    removeKey k ((k', v):xs) | k == k'   = xs
+                             | otherwise = (k', v): removeKey k xs
+
 instance Eq k => KeyValue KeyValueList k v where
   empty = KeyValueList []
+  insert k v (KeyValueList m) = deDuplicateKeys $ (k, v) : m
   lookup k (KeyValueList m) = L.lookup k m
 
 -- lazy maps
@@ -48,6 +57,7 @@ newtype LazyMap k v = LazyMap (M.Map k v)
 
 instance Ord k => KeyValue LazyMap k v where
   empty = LazyMap ML.empty
+  insert k v (LazyMap m) = LazyMap $ ML.insert k v m
   lookup k (LazyMap m) = ML.lookup k m
 
 -- strict maps
@@ -57,6 +67,7 @@ newtype StrictMap k v = StrictMap (M.Map k v)
 
 instance Ord k => KeyValue StrictMap k v where
   empty = StrictMap MS.empty
+  insert k v (StrictMap m) = StrictMap $ MS.insert k v m
   lookup k (StrictMap m) = MS.lookup k m
 
 -- lazy hashmaps
@@ -66,6 +77,7 @@ newtype LazyHash k v = LazyHash (H.HashMap k v)
 
 instance (Eq k, Hashable k) => KeyValue LazyHash k v where
   empty = LazyHash HL.empty
+  insert k v (LazyHash m) = LazyHash $ HL.insert k v m
   lookup k (LazyHash m) = HL.lookup k m
 
 -- strict hashmaps
@@ -75,4 +87,5 @@ newtype StrictHash k v = StrictHash (H.HashMap k v)
 
 instance (Eq k, Hashable k) => KeyValue StrictHash k v where
   empty = StrictHash HS.empty
+  insert k v (StrictHash m) = StrictHash $ HS.insert k v m
   lookup k (StrictHash m) = HS.lookup k m
