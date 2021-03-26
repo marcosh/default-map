@@ -38,6 +38,11 @@ spec =
             \(m1 :: KeyValueList Int Int, m2 :: KeyValueList Int Int, d :: Int) ->
               DefaultMap m1 d `shouldNotBe` DefaultMap m2 d
 
+    describe "show" $ do
+      it "uses the show instances of the map and the default value" $ do
+        forAll arbitraryDefaultMap $
+          \dm@(DefaultMap m d) -> show dm `shouldBe` "DefaultMap " ++ show m ++ " " ++ show d
+
     describe "constant" $ do
       it "contains only the default value" $ do
         forAll arbitrary $
