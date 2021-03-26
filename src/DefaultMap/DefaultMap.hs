@@ -24,6 +24,11 @@ instance (Show (c k v), Show v) => Show (DefaultMap c k v) where
 constant :: KeyValue c k v => v -> DefaultMap c k v
 constant = DefaultMap KV.empty
 
+-- insertion
+
+insert :: KeyValue c k v => k -> v -> DefaultMap c k v -> DefaultMap c k v
+insert k v (DefaultMap m d) = DefaultMap (KV.insert k v m) d
+
 -- query
 
 lookup :: KeyValue c k v => k -> DefaultMap c k v -> v

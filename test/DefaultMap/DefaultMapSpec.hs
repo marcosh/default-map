@@ -23,27 +23,33 @@ arbitraryDefaultMap = DM.DefaultMap -- . KeyValueList <$> listOf ((,) <$> _asdf 
 spec :: Spec
 spec =
   describe "DefaultMap" $ do
-    describe "==" $ do
-      it "is reflexive" $ do
-        forAll arbitraryDefaultMap $
-          \dm -> dm `shouldBe` dm
+    describe "DefaultMap" $ do
+      describe "==" $ do
+        it "is reflexive" $ do
+          forAll arbitraryDefaultMap $
+            \dm -> dm `shouldBe` dm
 
-      it "does distinguish different defaults" $ do
-        forAll (((,,) <$> arbitraryKeyValueList <*> arbitrary <*> arbitrary) `suchThat` \(_, d1, d2) -> d1 /= d2) $ do
-          \(m :: KeyValueList Int Int, d1 :: Int, d2 :: Int) -> DefaultMap m d1 `shouldNotBe` DefaultMap m d2
+        it "does distinguish different defaults" $ do
+          forAll (((,,) <$> arbitraryKeyValueList <*> arbitrary <*> arbitrary) `suchThat` \(_, d1, d2) -> d1 /= d2) $ do
+            \(m :: KeyValueList Int Int, d1 :: Int, d2 :: Int) -> DefaultMap m d1 `shouldNotBe` DefaultMap m d2
 
-      it "does distinguish different maps" $ do
-        forAll (((,,) <$> arbitraryKeyValueList <*> arbitraryKeyValueList <*> arbitrary)
-          `suchThat` \(m1, m2, _) -> m1 /= m2) $ do
-            \(m1 :: KeyValueList Int Int, m2 :: KeyValueList Int Int, d :: Int) ->
-              DefaultMap m1 d `shouldNotBe` DefaultMap m2 d
+        it "does distinguish different maps" $ do
+          forAll (((,,) <$> arbitraryKeyValueList <*> arbitraryKeyValueList <*> arbitrary)
+            `suchThat` \(m1, m2, _) -> m1 /= m2) $ do
+              \(m1 :: KeyValueList Int Int, m2 :: KeyValueList Int Int, d :: Int) ->
+                DefaultMap m1 d `shouldNotBe` DefaultMap m2 d
 
-    describe "show" $ do
-      it "uses the show instances of the map and the default value" $ do
-        forAll arbitraryDefaultMap $
-          \dm@(DefaultMap m d) -> show dm `shouldBe` "DefaultMap " ++ show m ++ " " ++ show d
+      describe "show" $ do
+        it "uses the show instances of the map and the default value" $ do
+          forAll arbitraryDefaultMap $
+            \dm@(DefaultMap m d) -> show dm `shouldBe` "DefaultMap " ++ show m ++ " " ++ show d
 
-    describe "constant" $ do
-      it "contains only the default value" $ do
-        forAll arbitrary $
-          \(k :: Int, v :: Int) -> DM.lookup k (DM.constant v :: DefaultMap KeyValueList Int Int) `shouldBe` v
+      describe "constant" $ do
+        it "contains only the default value" $ do
+          forAll arbitrary $
+            \(k :: Int, v :: Int) -> DM.lookup k (DM.constant v :: DefaultMap KeyValueList Int Int) `shouldBe` v
+
+      describe "lookup" $ do
+        it "returns what was just inserted" $ do
+          forAll ((,,) <$> arbitraryDefaultMap <*> arbitrary <*> arbitrary) $
+            \(dm, k, v) -> DM.lookup k (DM.insert k v dm) `shouldBe` v
