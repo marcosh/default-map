@@ -3,17 +3,21 @@
 module DefaultMap.DefaultMapSpec where
 
 import qualified DefaultMap.DefaultMap as DM
+import DefaultMap.DefaultMap (DefaultMap(DefaultMap))
 import DefaultMap.KeyValue
 
 -- hspec
-import Test.Hspec (Spec, describe, it, shouldBe)
+import Test.Hspec (Spec, describe, it, shouldBe, shouldNotBe)
 
 -- QuickCheck
-import Test.QuickCheck (Gen, arbitrary, forAll)
+import Test.QuickCheck (Gen, arbitrary, forAll, suchThat)
+
+arbitraryKeyValueList :: Gen (KeyValueList Int Int)
+arbitraryKeyValueList = KeyValueList <$> arbitrary
 
 arbitraryDefaultMap :: Gen (DM.DefaultMap KeyValueList Int Int)
 arbitraryDefaultMap = DM.DefaultMap -- . KeyValueList <$> listOf ((,) <$> _asdf <*> _qwer)
-  <$> (KeyValueList <$> arbitrary)
+  <$> arbitraryKeyValueList
   <*> arbitrary
 
 spec :: Spec
@@ -22,9 +26,19 @@ spec =
     describe "==" $ do
       it "is reflexive" $ do
         forAll arbitraryDefaultMap $
-          \dm -> dm == dm
+          \dm -> dm `shouldBe` dm
+
+      it "does distinguish different defaults" $ do
+        forAll (((,,) <$> arbitraryKeyValueList <*> arbitrary <*> arbitrary) `suchThat` \(_, d1, d2) -> d1 /= d2) $ do
+          \(m :: KeyValueList Int Int, d1 :: Int, d2 :: Int) -> DefaultMap m d1 `shouldNotBe` DefaultMap m d2
+
+      it "does distinguish different maps" $ do
+        forAll (((,,) <$> arbitraryKeyValueList <*> arbitraryKeyValueList <*> arbitrary)
+          `suchThat` \(m1, m2, _) -> m1 /= m2) $ do
+            \(m1 :: KeyValueList Int Int, m2 :: KeyValueList Int Int, d :: Int) ->
+              DefaultMap m1 d `shouldNotBe` DefaultMap m2 d
 
     describe "constant" $ do
       it "contains only the default value" $ do
         forAll arbitrary $
-          \(k :: Int, v :: Int) -> DM.lookup k (DM.constant v :: DM.DefaultMap KeyValueList Int Int) `shouldBe` v
+          \(k :: Int, v :: Int) -> DM.lookup k (DM.constant v :: DefaultMap KeyValueList Int Int) `shouldBe` v
