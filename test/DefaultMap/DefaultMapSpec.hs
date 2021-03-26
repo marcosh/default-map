@@ -9,11 +9,21 @@ import DefaultMap.KeyValue
 import Test.Hspec (Spec, describe, it, shouldBe)
 
 -- QuickCheck
-import Test.QuickCheck (arbitrary, forAll)
+import Test.QuickCheck (Gen, arbitrary, forAll)
+
+arbitraryDefaultMap :: Gen (DM.DefaultMap KeyValueList Int Int)
+arbitraryDefaultMap = DM.DefaultMap -- . KeyValueList <$> listOf ((,) <$> _asdf <*> _qwer)
+  <$> (KeyValueList <$> arbitrary)
+  <*> arbitrary
 
 spec :: Spec
 spec =
   describe "DefaultMap" $ do
+    describe "==" $ do
+      it "is reflexive" $ do
+        forAll arbitraryDefaultMap $
+          \dm -> dm == dm
+
     describe "constant" $ do
       it "contains only the default value" $ do
         forAll arbitrary $
