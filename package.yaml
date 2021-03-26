@@ -1,8 +1,8 @@
-name:                almost-constant-functions
+name:                default-map
 version:             0.1.0.0
 #synopsis:
 #description:
-homepage:            https://github.com/githubuser/almost-constant-functions#readme
+homepage:            https://github.com/marcosh/default-map#readme
 license:             OtherLicense
 author:              Marco Perone
 maintainer:          pasafama@gmail.com
@@ -25,3 +25,14 @@ library:
   source-dirs:      src
   dependencies:
     - containers
+    - hashable
+    - unordered-containers
+
+tests:
+  default-map-spec:
+    main:           Spec.hs
+    source-dirs:    test
+    dependencies:
+      - default-map
+      - hspec
+      - QuickCheck
