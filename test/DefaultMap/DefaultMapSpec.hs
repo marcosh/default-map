@@ -13,7 +13,7 @@ import Test.Hspec (Spec, describe, it, shouldBe, shouldNotBe)
 import Test.QuickCheck (Gen, arbitrary, forAll, suchThat)
 
 arbitraryKeyValueList :: Gen (KeyValueList Int Int)
-arbitraryKeyValueList = KeyValueList <$> arbitrary
+arbitraryKeyValueList = fromList <$> arbitrary
 
 arbitraryDefaultMap :: Gen (DM.DefaultMap KeyValueList Int Int)
 arbitraryDefaultMap = DM.DefaultMap -- . KeyValueList <$> listOf ((,) <$> _asdf <*> _qwer)

@@ -1,7 +1,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module DefaultMap.KeyValue where
+module DefaultMap.KeyValue
+  ( KeyValue(..)
+  , KeyValueList
+  , fromList
+  , insertKVL
+  , LazyMap(..)
+  , StrictMap(..)
+  , LazyHash(..)
+  , StrictHash(..)
+  ) where
 
 -- base
 import qualified Data.List as L
@@ -34,20 +43,23 @@ class KeyValue c k v where
 
 -- list
 
+-- a key value list with no duplicate keys
 newtype KeyValueList k v = KeyValueList [(k, v)]
   deriving (Eq, Show)
 
--- TODO: find a linear time implementation
-deDuplicateKeys :: (Eq k ) => [(k, v)] -> KeyValueList k v
-deDuplicateKeys pairs = KeyValueList $ foldr (\(k, v) xs -> (k, v) : removeKey k xs) [] pairs
+fromList :: Eq k => [(k, v)] -> KeyValueList k v
+fromList = KeyValueList . L.nubBy (\kv1 kv2 -> fst kv1 == fst kv2)
+
+insertKVL :: Eq k => (k, v) -> KeyValueList k v -> KeyValueList k v
+insertKVL (k, v) (KeyValueList m) = KeyValueList $ (k, v) : removeKey k m
   where
-    removeKey _ []                       = []
-    removeKey k ((k', v):xs) | k == k'   = xs
-                             | otherwise = (k', v): removeKey k xs
+    removeKey _ []       = []
+    removeKey k' (kv:m') | k' == fst kv = m'
+                         | otherwise    = kv:removeKey k' m'
 
 instance Eq k => KeyValue KeyValueList k v where
   empty = KeyValueList []
-  insert k v (KeyValueList m) = deDuplicateKeys $ (k, v) : m
+  insert k v m = insertKVL (k, v) m
   lookup k (KeyValueList m) = L.lookup k m
 
 -- lazy maps
